@@ -1,0 +1,18 @@
+{
+    "topic": "o3 Developer Model Behavior",
+    "author": "Alex Novotny",
+    "provider": "OpenAI",
+    "model": "o3",
+    "technologies": "Box AI, OpenAI O3, Python SDK, API Integration",
+    "youtube": {
+        "shared_link": "https://cloud.box.com/s/hsjouwpbhpwjj9584oht3qdm2qxlz777",
+        "srt": "https://cloud.box.com/s/mh2hdl5x1dumlinq3w07vm7ihnsfei2u",
+        "title": "Explore the Box AI API with OpenAI o3: Metadata extraction and photo analysis",
+        "thumbnail": "https://cloud.box.com/s/dcw5iu9ye59jrxhp6rywfwzgaojc1iz3",
+        "description": "Join Alex Novotny, Senior Developer Advocate at Box, as he puts OpenAI’s brand-new O3 model to the test inside the Box AI API. Watch Alex automate invoice metadata and identify objects in photos all using Box. Whether you’re an enterprise developer, a content manager, or simply curious about practical AI, this demo shows how easily O3 can boost productivity and unlock new workflows.\nKey takeaways:\n↳ Extract and auto-apply invoice metadata across multiple files in seconds.\n↳ Run multi-item Q&A on images to detect planes, cars, people, and more.\n↳ Discover tips for integrating the Box AI API and Python SDK into larger automation pipelines.",
+        "tags": "box,box.com,box ai,box ai api,openai o3,o3 model,enterprise content,document processing,metadata extraction,invoice processing,photo analysis,image recognition,python sdk,api demo,machine learning tutorials,ai"
+    },
+    "linkedin" : "Box AI now supports OpenAI’s brand-new o3 model. See how to tap into o3 with the Box AI API for next-level document processing, bulk metadata extraction and image Q&A — all inside your Box workflows.\nO3 shines in:↳ Extracting metadata across entire folders of invoices in seconds↳ Handling single and multi-file Q&A for images, PDFs, and more.\nReady to supercharge your enterprise content?",
+    "x" : "Box AI integrates seamlessly with OpenAI’s new o3 model. See how Box AI API can extract invoice metadata in bulk and answer image questions",
+    "blog" : "Box AI integrates seamlessly with OpenAI’s new o3 model. See how Box AI API can extract invoice metadata in bulk and answer image questions"
+}

@@ -39,6 +39,16 @@ class ai_util:
         
         return content
     
+    def get_video(self, file_key):
+        bucket = self.recordings_store
+        response = self.s3.get_object(
+            Bucket=bucket,
+            Key=f"{file_key}"
+        )
+        content = response['Body'].read()
+        
+        return content
+    
     def delete_files(self, *file_keys):
         for file_key in file_keys:
             try:

@@ -10,6 +10,8 @@ import logging
 import os
 from pprint import pformat
 import uuid
+from thumbnail import extract_person_thumbnail, get_random_video_frame
+
 
 import ai_util,box_util
 
@@ -194,6 +196,29 @@ def process_transcription(transcription_file,job_data,box,ai,video_shared_link, 
         logger.debug(f"doc_contents {doc_contents}")
 
         box.generate_document(doc_contents, job_data['folder_id'], meeting_file, credentials['template_id'])
+
+        thumbnail_folder_id = box.create_folder(job_data['folder_id'])
+        video_content = ai.get_video(job_data['file_name'])  # Replace with the path to your video file
+        video_file = "/tmp/video.mp4"
+        with open(video_file, "wb") as f:
+            f.write(video_content)
+
+        frame_count = 10
+
+        for i in range(frame_count):
+            file_name = get_random_video_frame(video_file)
+
+            with open(file_name, 'rb') as f: # type: ignore
+                image_bytes = f.read()
+                result_bytes = extract_person_thumbnail(
+                    input_data=image_bytes,
+                    target_size=(1920, 1080),  # YouTube thumbnail size
+                    preserve_original_lighting=True  # Keep natural lighting
+                )
+            if result_bytes is not None:
+                box.upload_file(f"{meeting_file}_thumbnail_{i}.jpg", result_bytes, thumbnail_folder_id)
+
+            print(f"Thumbnail extraction complete.")
 
         return {
             'statusCode' : 200

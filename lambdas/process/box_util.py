@@ -27,6 +27,7 @@ from box_sdk_gen import (
     DocGenJobV2025R0StatusField,
     AddShareLinkToFileSharedLink,
     AddShareLinkToFileSharedLinkAccessField,
+    CreateFolderParent
 )
 
 from box_sdk_gen.internal.utils import ByteStream
@@ -229,3 +230,21 @@ class box_util:
 
         self.logger.debug(f"Shared link response: {response}")
         return response.shared_link.url # type: ignore
+    
+    def create_folder(self, parent_folder_id):
+        try:
+            parent_folder_contents = self.client.folders.get_folder_items(parent_folder_id)
+
+            for entry in parent_folder_contents.entries: # type: ignore
+                if entry.type == "folder" and entry.name == "thumbnails":
+                    return entry.id
+
+
+            folder = self.client.folders.create_folder(
+                "thumbnails",
+                parent=CreateFolderParent(id=parent_folder_id)
+            )
+            return folder.id # type: ignore
+        except Exception as e:
+            self.logger.error(f"Error creating folder: {e}")
+            return None

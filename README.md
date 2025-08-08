@@ -10,8 +10,9 @@ This Box Skill automatically processes video/audio files uploaded to configured 
 1. **Transcription**: Downloads media files, uploads to S3, and uses AWS Transcribe to generate SRT subtitles
 2. **AI Analysis**: Leverages Box AI to extract metadata and generate social media content
 3. **Content Generation**: Creates YouTube descriptions, LinkedIn posts, X (Twitter) posts, and blog content
-4. **Document Creation**: Uses Box Doc Gen to compile everything into a comprehensive document
-5. **Cleanup**: Automatically removes temporary files after processing
+4. **Thumbnail Generation**: Extracts random video frames and creates professional thumbnails with AI-powered background removal
+5. **Document Creation**: Uses Box DocGen to compile everything into a comprehensive document
+6. **Cleanup**: Automatically removes temporary files after processing
 
 ## Architecture
 
@@ -19,7 +20,7 @@ This Box Skill automatically processes video/audio files uploaded to configured 
 - **Lambda Functions**: 
   - Skill Lambda: Validates webhooks and queues jobs
   - Transcribe Lambda: Handles video download and transcription
-  - Process Lambda: Generates content using Box AI and DocGen
+  - Process Lambda: Container image function with ML libraries for content generation, thumbnail creation, and DocGen
 - **Storage**: S3 buckets for video storage and transcriptions
 - **Queue**: SQS for reliable job processing with dead letter queue
 - **Database**: DynamoDB for job tracking
@@ -109,14 +110,58 @@ pytest --cov=lambdas --cov-report=html
 - **Dead Letter Queue**: Failed job investigation
 - **CloudTrail**: Complete audit trail of all AWS API calls
 
+## Features
+
+### Thumbnail Generation
+- **AI-Powered Background Removal**: Uses rembg with ONNX runtime for professional thumbnail creation
+- **Smart Frame Extraction**: Randomly selects frames from first 10 seconds of video
+- **Professional Enhancement**: Applies contrast, sharpness, and color adjustments
+- **Multiple Thumbnails**: Generates 10 thumbnail variations per video
+- **Organized Storage**: Creates dedicated "thumbnails" folder in Box
+
+### Content Generation
+- **Multi-Platform Content**: YouTube descriptions, LinkedIn posts, X tweets, and blog posts
+- **Metadata Extraction**: Automatically extracts topic, author, technologies, and tags
+- **Timestamped Transcripts**: Creates formatted transcripts with timestamps
+- **Professional Documents**: Compiles everything into structured DocGen documents
+
 ## Security Features
 
-- VPC isolation for internal processing
-- Secrets Manager for credential storage
-- Minimal IAM permissions following least privilege
-- Encrypted S3 buckets with versioning
-- CORS restricted to Box domains only
-- Webhook signature validation
+### Network Security
+- **VPC Isolation**: Lambda functions run in private VPC subnets
+- **NAT Gateway**: Secure outbound internet access for API calls
+- **Security Groups**: Restrictive inbound/outbound rules
+- **Private Subnets**: No direct internet access for processing functions
+
+### Data Protection
+- **Encrypted S3 Buckets**: Server-side encryption with versioning enabled
+- **Secrets Manager**: Secure storage of Box API credentials and keys
+- **Temporary File Cleanup**: Automatic deletion of processed files
+- **In-Transit Encryption**: HTTPS/TLS for all API communications
+
+### Access Control
+- **Minimal IAM Permissions**: Least privilege principle for all roles
+- **Resource-Based Policies**: Specific permissions per Lambda function
+- **Cross-Account Protection**: Prevents unauthorized access
+- **Service-Linked Roles**: AWS-managed permissions where applicable
+
+### Authentication & Authorization
+- **Webhook Signature Validation**: HMAC-SHA256 verification of Box webhooks
+- **Box OAuth**: Secure token-based authentication
+- **Client Credentials Grant**: Server-to-server authentication
+- **API Key Rotation**: Support for primary/secondary key rotation
+
+### Monitoring & Auditing
+- **CloudTrail Logging**: Complete audit trail of all AWS API calls
+- **CloudWatch Alarms**: Real-time monitoring and alerting
+- **Dead Letter Queue**: Failed job tracking and investigation
+- **Structured Logging**: Comprehensive application logs
+
+### Application Security
+- **CORS Restrictions**: API Gateway limited to Box domains only
+- **Input Validation**: Webhook payload verification
+- **Error Handling**: Secure error messages without sensitive data exposure
+- **Container Security**: Read-only filesystem with minimal attack surface
 
 ## CDK Commands
 
@@ -126,6 +171,25 @@ pytest --cov=lambdas --cov-report=html
 - `cdk diff` - Compare deployed stack with current state
 - `cdk destroy` - Remove all AWS resources
 
+## Technical Implementation
+
+### Container Image Lambda
+- **Process Lambda** uses Docker container for ML dependencies (rembg, onnxruntime, OpenCV)
+- **Platform**: Built for linux/amd64 architecture for Lambda compatibility
+- **Caching**: Optimized environment variables to handle read-only filesystem
+- **Memory**: 10GB memory allocation for ML processing
+
+### ML Libraries
+- **rembg**: AI background removal using U²-Net models
+- **onnxruntime**: Optimized inference engine for neural networks
+- **OpenCV**: Computer vision operations for video frame extraction
+- **Pillow**: Image processing and enhancement
+
+### Error Handling
+- **Dead Letter Queue**: Failed jobs with 3 retry attempts
+- **CloudWatch Alarms**: Monitoring for all Lambda functions
+- **Graceful Degradation**: Continues processing even if thumbnail generation fails
+
 ## Troubleshooting
 
 - Check CloudWatch logs for Lambda errors
@@ -133,3 +197,5 @@ pytest --cov=lambdas --cov-report=html
 - Verify Box webhook signature validation
 - Ensure all Box AI agents are properly configured
 - Confirm DocGen template exists and is accessible
+- **Container Issues**: Check Docker build logs for ML library compilation errors
+- **Thumbnail Failures**: Verify video format compatibility and memory allocation
